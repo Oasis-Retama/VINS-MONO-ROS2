@@ -1,0 +1,89 @@
+%YAML:1.0
+
+#common parameters
+imu_topic: "/imu/data"
+image_topic: "/camera/image_raw"
+output_path: "/tmp/vins_output/"
+
+#camera calibration 
+model_type: PINHOLE
+camera_name: camera
+image_width: 640
+image_height: 512
+
+# IMPORTANT: Get these values from your /camera/camera_info topic!
+# Run: ros2 topic echo /camera/camera_info --once
+# Then copy the K matrix: [fx, 0, cx, 0, fy, cy, 0, 0, 1]
+projection_parameters:
+   fx: 500.0   # from bag /camera/camera_info K[0]
+   fy: 500.0   # from bag /camera/camera_info K[4]
+   cx: 320.0   # from bag /camera/camera_info K[2]
+   cy: 256.0   # from bag /camera/camera_info K[5]
+
+# Distortion parameters from camera_info D array
+distortion_parameters:
+   k1: 0.0     # from bag /camera/camera_info D[0]
+   k2: 0.0     # from bag /camera/camera_info D[1]
+   p1: 0.0     # from bag /camera/camera_info D[2]
+   p2: 0.0     # from bag /camera/camera_info D[3]
+
+# Extrinsic parameter between IMU and Camera
+estimate_extrinsic: 1   # 0: have extrinsic; 1: calibrate online; 2: no extrinsic
+estimate_td: 1          # online estimate time offset between camera and IMU
+td: 0.0                 # initial value of time offset
+
+# Rotation from camera frame to imu frame, imu^R_cam
+extrinsicRotation: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1, 0, 0, 
+          0, 1, 0, 
+          0, 0, 1]
+
+# Translation from camera frame to imu frame, imu^T_cam
+extrinsicTranslation: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [0, 0, 0]
+
+#feature tracker parameters
+max_cnt: 150            # max feature number in feature tracking
+min_dist: 30            # min distance between two features 
+freq: 10                # frequence (Hz) of publish tracking result
+F_threshold: 1.0        # ransac threshold (pixel)
+show_track: 1           # publish tracking image as topic
+equalize: 1             # if image is too dark or light, turn on equalize
+fisheye: 0              # if using fisheye, turn on it
+
+#optimization parameters
+max_solver_time: 0.04   # max solver iteration time (ms)
+max_num_iterations: 8   # max solver iterations
+keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
+
+#imu parameters (generic values - tune these if you have IMU specs)
+acc_n: 0.08             # accelerometer measurement noise standard deviation
+gyr_n: 0.004            # gyroscope measurement noise standard deviation
+acc_w: 0.00004          # accelerometer bias random walk noise standard deviation
+gyr_w: 2.0e-6           # gyroscope bias random walk noise standard deviation
+g_norm: 9.81007         # gravity magnitude
+
+#loop closure parameters
+loop_closure: 1                    # start loop closure
+fast_relocalization: 0             # useful in real-time and large project
+load_previous_pose_graph: 0        # load and reuse previous pose graph
+pose_graph_save_path: "/tmp/vins_output/pose_graph/"
+
+#unsynchronization parameters
+estimate_td: 1                      # online estimate time offset between camera and imu
+td: 0.0                             # initial value of time offset (seconds)
+
+#rolling shutter parameters
+rolling_shutter: 0                  # 0: global shutter, 1: rolling shutter
+rolling_shutter_tr: 0               # rolling shutter read out time per frame (seconds)
+
+#visualization parameters
+save_image: 1                       # save image in pose graph for visualization
+visualize_imu_forward: 0            # output imu forward propagation
+visualize_camera_size: 0.4          # size of camera marker in RVIZ

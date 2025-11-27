@@ -14,6 +14,21 @@ This repository implements the ROS2 version of VINS-MONO, mainly including the f
  
 ![mh01](https://github.com/dongbo19/VINS-MONO-ROS2/blob/main/config_pkg/config/gif/vins_ros2_mh01.gif)
 ![mh02](https://github.com/dongbo19/VINS-MONO-ROS2/blob/main/config_pkg/config/gif/vins_ros2_mh02.gif)
+
+# Run Sky Anchor pipeline in Docker (local bags)
+From the workspace root, bring up the container, then launch each component in its own terminal:
+1. Start container (PC default):  
+   `./scripts/run_sky_anchor_docker.sh`
+2. Inside the container shell, start zenoh:  
+   `ros2 run rmw_zenoh_cpp rmw_zenohd`
+3. New host terminal → attach: `docker exec -it sky-anchor-hub bash`, then run feature tracker:  
+   `ros2 launch feature_tracker my_flight_feature_tracker.launch.py`
+4. Another terminal → `docker exec -it sky-anchor-hub bash`, then run VINS estimator:  
+   `ros2 launch vins_estimator my_flight.launch.py`
+5. Another terminal → `docker exec -it sky-anchor-hub bash`, verify the bag exists and play it:  
+   `ls /workspaces/ros2_workspace/rosbag_recordings/combined.mcap_0.mcap`  
+   `ros2 bag play /workspaces/ros2_workspace/rosbag_recordings/combined.mcap_0.mcap`
+
 # 2. Prerequisites
 * System  
   * Ubuntu 24.04  

@@ -1,8 +1,8 @@
 %YAML:1.0
 
 #common parameters
-imu_topic: "/imu/data"
-image_topic: "/camera/image_raw"
+imu_topic: "/imx8/cube_imu/data"
+image_topic: "/imx8/image_raw"
 output_path: "/tmp/vins_output/"
 
 #camera calibration 
